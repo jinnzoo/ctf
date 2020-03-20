@@ -1,0 +1,2 @@
+# Solution
+fsbを2回行うことができるので、1回目でlibc leakをしone_gadgetのアドレスを計算する。2回目でgot overwriteでputsを上書きし、one_gadgetに飛ばす。
