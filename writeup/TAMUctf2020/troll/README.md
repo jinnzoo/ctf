@@ -43,7 +43,8 @@
   puts("You have failed. Goodbye.");
   return 0;
 }
-
+```
+```
 $ python3 exploit.py
 <snip>
 
