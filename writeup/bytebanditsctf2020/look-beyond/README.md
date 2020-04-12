@@ -9,10 +9,22 @@ $ checksec ./chall
     PIE:      No PIE
 ```
 
-addressのリークは不可能。readで任意のアドレスへ8バイトの書き込みが可能。
-しかし、readの直後にはcanaryが破壊されていた場合に走るstack_chk_fail命令しか存在しない。また.fini_arrayは書き込み不可。      
+```
+$ ./chall
+size: 10
+idx: 0
+where: 0
+0
+```
+プログラムの挙動は次の通り。     
++ sizeにて指定した数値を引数としたmallocが実行される。
++ idxにて数値Bを指定すると、mallocにて返ってきたアドレス+Bのアドレスへ1を書き込む。
++ whereで指定したアドレスへ8バイトの書き込みが可能（readによる書き込み）     
+     
+以上よりaddressのリークは不可能。readで任意のアドレスへ8バイトの書き込みが可能。          
+しかし、readの直後にはcanaryが破壊されていた場合に走るstack_chk_fail命令しか存在しない。また.fini_arrayは書き込み不可。       
  
-そこであらかじめcanaryを破壊しておいて、readでstack_chk_fail@gotを上書きしmain関数の先頭へ戻すことを考える。    
+そこでsizeとidxに適切な数値を入力することによりcanaryを破壊し、readでstack_chk_fail@gotを上書きしmain関数の先頭へ戻すことを考える。    
 main関数の先頭へ戻すとputs@gotのアドレスをリークしてくれるため、libcが計算可能になる。(1回目のmain関数の最後のあたりの命令でglobal領域の変数を更新するため)
 そのため、2回目もあらかじめcanaryを破壊しておいて、readでstack_chk_fail@gotをone_gadgetに上書きしシェルを起動する。
 
